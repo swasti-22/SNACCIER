@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "site": "snaccier",
+    "public": "out",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

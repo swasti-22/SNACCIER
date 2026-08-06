@@ -1,0 +1,97 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 5%;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.logo {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--primary-pink);
+  text-shadow: 0 2px 4px rgba(248, 183, 205, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.link {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  opacity: 0.8;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.link:hover {
+  opacity: 1;
+  background: var(--blush);
+  color: var(--primary-pink-hover);
+}
+
+.cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary-pink);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(248, 183, 205, 0.4);
+}
+
+.cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(248, 183, 205, 0.6);
+  color: white;
+}
+
+.badge {
+  background: white;
+  color: var(--primary-pink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.logout {
+  background: transparent;
+  border: 1px solid var(--muted-grey);
+  color: var(--muted-grey);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.logout:hover {
+  background: var(--muted-grey);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .links {
+    display: none; /* In a real app we'd add a hamburger menu, keeping simple for demo */
+  }
+  .mobileCart {
+    display: flex;
+  }
+}

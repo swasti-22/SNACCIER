@@ -1,0 +1,110 @@
+.container {
+  min-height: calc(100vh - 80px); /* rough navbar offset */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.authCard {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  padding: 3rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255,255,255,0.8);
+  width: 100%;
+  max-width: 450px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted-grey);
+  margin-bottom: 2rem;
+}
+
+.errorBanner {
+  background: #FFF0F0;
+  color: #D32F2F;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+  border: 1px solid #FFCDCD;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.inputGroup input, .inputGroup select {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0,0,0,0.1);
+  background: white;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.inputGroup input:focus, .inputGroup select:focus {
+  outline: none;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 0 3px rgba(248, 183, 205, 0.2);
+}
+
+.submitBtn {
+  background: var(--primary-pink);
+  color: white;
+  padding: 1rem;
+  border-radius: var(--radius-full);
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(248, 183, 205, 0.3);
+  margin-top: 1rem;
+}
+
+.submitBtn:hover {
+  background: var(--primary-pink-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(248, 183, 205, 0.5);
+}
+
+.toggleText {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--muted-grey);
+}
+
+.toggleBtn {
+  color: var(--primary-pink);
+  font-weight: 600;
+  padding: 0;
+}
+
+.toggleBtn:hover {
+  text-decoration: underline;
+}
