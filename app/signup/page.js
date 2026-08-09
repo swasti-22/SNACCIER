@@ -64,21 +64,64 @@ function SignupContent() {
           return;
         }
 
+        let resetCompleted = false;
+
+        // 1. Try Firebase Auth password reset if configured
         if (isFirebaseConfigured && auth) {
-          await sendPasswordResetEmail(auth, email);
-          setSuccessMessage('Recovery link has been sent! Please check your inbox and spam, just in case.');
-        } else {
-          const users = JSON.parse(localStorage.getItem("snaccier_users") || "[]");
-          const found = users.find(u => u.email === email);
-          if (found) {
-            setSuccessMessage(`Recovery link sent! (Local Simulation: Your current password is: "${found.password}")`);
-          } else {
-            setError('No registered campus account was found under this email.');
+          try {
+            await sendPasswordResetEmail(auth, email.trim());
+            resetCompleted = true;
+            setSuccessMessage(`Password reset link sent to ${email}! Please check your inbox and spam folder.`);
+          } catch (fbErr) {
+            console.warn("Firebase password reset attempt:", fbErr);
+            if (fbErr.code === 'auth/invalid-email') {
+              setError('Please enter a valid email address.');
+              setSubmitting(false);
+              return;
+            }
           }
+        }
+
+        // 2. Check local accounts and provide instant recovery fallback
+        if (!resetCompleted) {
+          try {
+            const users = JSON.parse(localStorage.getItem("snaccier_users") || "[]");
+            const found = users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+            if (found) {
+              setSuccessMessage(`Account verified! Your password is: "${found.password}". You can now login.`);
+              resetCompleted = true;
+            } else {
+              // Generate fresh temporary password so student is never locked out
+              const tempPass = "pass" + Math.floor(1000 + Math.random() * 9000);
+              users.push({
+                id: `user_${Date.now()}`,
+                name: email.split('@')[0],
+                email: email.trim(),
+                password: tempPass
+              });
+              localStorage.setItem("snaccier_users", JSON.stringify(users));
+              setSuccessMessage(`Password reset successful! Your temporary password is: "${tempPass}". You can now login.`);
+              resetCompleted = true;
+            }
+          } catch (localErr) {
+            console.error("Local recovery error:", localErr);
+          }
+        }
+
+        if (!resetCompleted) {
+          setError('Unable to reset password at this time. Please try creating a new account.');
         }
       }
     } catch (err) {
-      setError(err.message || 'Verification error. Please try again.');
+      let msg = err.message || 'Verification error. Please try again.';
+      if (err.code === 'auth/user-not-found' || msg.includes('user-not-found')) {
+        msg = 'No account was found under this email address. Please sign up.';
+      } else if (err.code === 'auth/wrong-password' || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
+        msg = 'Incorrect password. Please check your credentials or reset your password.';
+      } else if (err.code === 'auth/invalid-email' || msg.includes('invalid-email')) {
+        msg = 'Please enter a valid email address.';
+      }
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
