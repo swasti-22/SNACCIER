@@ -45,7 +45,7 @@ export default function ShopMenuClient({ params }) {
     const unsubscribeShop = subscribeToShopById(shopId, (updatedShop) => {
       setShop(prev => {
         if (!prev) return { ...updatedShop, menu: [] };
-        return { ...updatedShop, menu: prev.menu };
+        return { ...updatedShop, menu: (prev.menu && prev.menu.length > 0) ? prev.menu : (updatedShop.menu || []) };
       });
     });
 
@@ -53,6 +53,7 @@ export default function ShopMenuClient({ params }) {
     const unsubscribeMenu = subscribeToMenu(shopId, (updatedMenu) => {
       setShop(prev => {
         if (!prev) return prev;
+        if (!updatedMenu || updatedMenu.length === 0) return prev;
         return { ...prev, menu: updatedMenu };
       });
     });
@@ -104,7 +105,7 @@ export default function ShopMenuClient({ params }) {
   }
 
   // Categories extraction
-  const categories = ['All', ...new Set(shop.menu.map(item => getHumorousCategory(item.category || shop.category, shopId)))];
+  const categories = ['All', ...new Set((shop.menu || []).map(item => item.category || shop.category).filter(Boolean))];
 
   // Adjust quantities locally before adding to cart
   const handleQuantityChange = (itemId, change) => {
@@ -126,7 +127,7 @@ export default function ShopMenuClient({ params }) {
   const updateCartItemQuantity = (itemId, qty) => {
     let currentCart = [...cartItems];
     const itemIndex = currentCart.findIndex(i => i.id === itemId && i.shopId === shopId);
-    const menuItem = shop.menu.find(i => i.id === itemId);
+    const menuItem = (shop.menu || []).find(i => i.id === itemId);
 
     if (qty === 0) {
       // Remove
@@ -164,11 +165,14 @@ export default function ShopMenuClient({ params }) {
   };
 
   // Filter menu items
-  const filteredMenu = shop.menu.filter(item => {
-    const itemCat = getStandardCategory(item.category || shop.category);
+  const filteredMenu = (shop.menu || []).filter(item => {
+    const itemCat = item.category || shop.category || "Snacks";
     const matchesCategory = activeCategory === 'All' || itemCat === activeCategory;
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const q = (searchQuery || '').toLowerCase().trim();
+    const matchesSearch = !q || 
+      (item.name && item.name.toLowerCase().includes(q)) || 
+      (item.description && item.description.toLowerCase().includes(q)) ||
+      (item.category && item.category.toLowerCase().includes(q));
     return matchesCategory && matchesSearch;
   });
 
