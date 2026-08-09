@@ -3,9 +3,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
-import { db, auth, isFirebaseConfigured } from '@/lib/firebase';
+import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { LogIn, UserPlus, RefreshCw, Key, Mail, User, ShieldAlert, ArrowLeft, Send, Check } from 'lucide-react';
+import { LogIn, UserPlus, RefreshCw, Key, Mail, User, ShieldAlert, ArrowLeft, Send, Check, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
 
@@ -13,12 +13,14 @@ function SignupContent() {
   const [viewMode, setViewMode] = useState('signup'); // 'login' | 'signup' | 'forgot'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   
-  const { loginStudent, signupStudent, user } = useAuth();
+  const { loginStudent, signupStudent, resetStudentPassword, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || 'dashboard';
@@ -29,6 +31,45 @@ function SignupContent() {
       router.push(`/${redirect}`);
     }
   }, [user, redirect]);
+
+  // Direct email sender handler for Firebase password reset
+  const handleSendEmailLink = async () => {
+    if (!email) {
+      setError('Please provide your email address first.');
+      return;
+    }
+    setError('');
+    setSuccessMessage('');
+    setSubmitting(true);
+
+    try {
+      if (isFirebaseConfigured && auth) {
+        const actionCodeSettings = {
+          url: typeof window !== 'undefined' ? `${window.location.origin}/login` : 'http://localhost:3000/login',
+          handleCodeInApp: true
+        };
+        await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
+        setEmailSent(true);
+        setSuccessMessage(`Reset link has been dispatched to ${email}! Please check your Inbox and Spam folder. (Or set a new password below)`);
+      } else {
+        setEmailSent(true);
+        setSuccessMessage(`Simulated mail sent to ${email}! You can also set a new password directly below.`);
+      }
+    } catch (fbErr) {
+      console.warn("Firebase email error:", fbErr);
+      if (fbErr.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else if (fbErr.code === 'auth/user-not-found') {
+        setEmailSent(true);
+        setSuccessMessage(`Notice: ${email} is registered locally on campus. You can set a new password directly below.`);
+      } else {
+        setEmailSent(true);
+        setSuccessMessage(`Email request processed. If the email doesn't appear in your inbox, set your new password directly below.`);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,53 +105,18 @@ function SignupContent() {
           return;
         }
 
-        let resetCompleted = false;
-
-        // 1. Try Firebase Auth password reset if configured
-        if (isFirebaseConfigured && auth) {
-          try {
-            await sendPasswordResetEmail(auth, email.trim());
-            resetCompleted = true;
-            setSuccessMessage(`Password reset link sent to ${email}! Please check your inbox and spam folder.`);
-          } catch (fbErr) {
-            console.warn("Firebase password reset attempt:", fbErr);
-            if (fbErr.code === 'auth/invalid-email') {
-              setError('Please enter a valid email address.');
-              setSubmitting(false);
-              return;
-            }
-          }
+        const passToSet = newPassword || password;
+        if (!passToSet || passToSet.length < 4) {
+          await handleSendEmailLink();
+          return;
         }
 
-        // 2. Check local accounts and provide instant recovery fallback
-        if (!resetCompleted) {
-          try {
-            const users = JSON.parse(localStorage.getItem("snaccier_users") || "[]");
-            const found = users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
-            if (found) {
-              setSuccessMessage(`Account verified! Your password is: "${found.password}". You can now login.`);
-              resetCompleted = true;
-            } else {
-              // Generate fresh temporary password so student is never locked out
-              const tempPass = "pass" + Math.floor(1000 + Math.random() * 9000);
-              users.push({
-                id: `user_${Date.now()}`,
-                name: email.split('@')[0],
-                email: email.trim(),
-                password: tempPass
-              });
-              localStorage.setItem("snaccier_users", JSON.stringify(users));
-              setSuccessMessage(`Password reset successful! Your temporary password is: "${tempPass}". You can now login.`);
-              resetCompleted = true;
-            }
-          } catch (localErr) {
-            console.error("Local recovery error:", localErr);
-          }
-        }
-
-        if (!resetCompleted) {
-          setError('Unable to reset password at this time. Please try creating a new account.');
-        }
+        // Direct instant password reset & login
+        await resetStudentPassword(email, passToSet);
+        setSuccessMessage('Password updated successfully! Logging you in...');
+        setTimeout(() => {
+          router.push(`/${redirect}`);
+        }, 800);
       }
     } catch (err) {
       let msg = err.message || 'Verification error. Please try again.';
@@ -149,7 +155,7 @@ function SignupContent() {
           <p className="text-xs text-mutedGrey font-bold leading-relaxed max-w-xs mx-auto">
             {viewMode === 'login' && 'Order food from your favorite campus canteens.'}
             {viewMode === 'signup' && 'Join the campus pre-ordering system.'}
-            {viewMode === 'forgot' && 'Enter your email to reset your account password.'}
+            {viewMode === 'forgot' && 'Send a reset link to your email or set a new password directly.'}
           </p>
         </div>
 
@@ -216,6 +222,7 @@ function SignupContent() {
                     onClick={() => {
                       setError('');
                       setSuccessMessage('');
+                      setEmailSent(false);
                       setViewMode('forgot');
                     }}
                     className="text-[10px] font-bold text-primary-hover hover:underline cursor-pointer"
@@ -238,6 +245,42 @@ function SignupContent() {
             </div>
           )}
 
+          {/* FORGOT PASSWORD SPECIFIC OPTIONS */}
+          {viewMode === 'forgot' && (
+            <div className="space-y-4 pt-2">
+              {/* Option 1: Send Reset Link */}
+              <button
+                type="button"
+                onClick={handleSendEmailLink}
+                disabled={submitting || !email}
+                className="w-full py-3 bg-white border-2 border-dashed border-primary text-textDark font-bold rounded-xl text-xs hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                <Send className="w-3.5 h-3.5 text-primary-hover" /> Send Reset Link to Email
+              </button>
+
+              <div className="relative flex py-1 items-center">
+                <div className="flex-grow border-t border-secondary"></div>
+                <span className="flex-shrink mx-3 text-[10px] font-bold text-mutedGrey uppercase tracking-widest">or set new password</span>
+                <div className="flex-grow border-t border-secondary"></div>
+              </div>
+
+              {/* Option 2: Direct New Password */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-mutedGrey uppercase tracking-wider block">New Password</label>
+                <div className="relative">
+                  <input 
+                    type="password" 
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)} 
+                    placeholder="Enter new password (min 6 chars)"
+                    className="w-full border border-secondary rounded-xl pl-10 pr-4 py-3 text-xs focus:outline-none focus:border-primary bg-background"
+                  />
+                  <Key className="absolute left-3.5 top-3.5 w-4 h-4 text-mutedGrey" />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Action button triggers */}
           <button
             type="submit"
@@ -256,7 +299,7 @@ function SignupContent() {
               </>
             ) : (
               <>
-                Send Recovery Link <Send className="w-4 h-4" />
+                Update Password & Log In <ShieldCheck className="w-4 h-4" />
               </>
             )}
           </button>
@@ -300,7 +343,7 @@ function SignupContent() {
 
           {viewMode === 'forgot' && (
             <div>
-              Remembered your credentials?{' '}
+              Remembered your password?{' '}
               <button 
                 type="button" 
                 onClick={() => {
@@ -321,11 +364,11 @@ function SignupContent() {
   );
 }
 
-export default function Signup() {
+export default function SignupPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-background flex flex-col justify-center items-center">
-        <Loader message="Loading portal secure gate..." />
+        <Loader message="Loading SNACCIER..." />
       </div>
     }>
       <SignupContent />
