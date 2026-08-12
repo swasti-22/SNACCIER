@@ -1,4 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SNACCIER 🍔☕
+
+> Campus Food Pre-ordering & Canteen Queue-Busting Web Platform.
+
+🌐 **Live Website:** [https://snaccier.vercel.app](https://snaccier.vercel.app)
+
+---
 
 ## Getting Started
 
