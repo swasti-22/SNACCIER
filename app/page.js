@@ -34,7 +34,14 @@ export default function Home() {
         }
         const storedOpinions = localStorage.getItem("snaccier_opinions");
         if (storedOpinions) {
-          if (storedOpinions.includes("samosa too spicy") || storedOpinions.includes("cold coffee lowkey") || storedOpinions.includes("fries were criminally")) {
+          if (
+            storedOpinions.includes("seed_") ||
+            storedOpinions.includes("lab sessions") ||
+            storedOpinions.includes("Amul's Koko") ||
+            storedOpinions.includes("samosa too spicy") || 
+            storedOpinions.includes("cold coffee lowkey") || 
+            storedOpinions.includes("fries were criminally")
+          ) {
             localStorage.setItem("snaccier_opinions", "[]");
             window.dispatchEvent(new Event("snaccier_opinions"));
           }
@@ -358,7 +365,7 @@ export default function Home() {
                   <textarea
                     value={newOpinion}
                     onChange={e => setNewOpinion(e.target.value)}
-                    placeholder="e.g. The cold coffee at SMOOZ is excellent."
+                    placeholder="e.g. The schezwan noodles at Danny's are top tier."
                     className="w-full border border-secondary rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary bg-white min-h-[60px]"
                     required
                     maxLength={140}

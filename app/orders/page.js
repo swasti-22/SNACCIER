@@ -97,7 +97,7 @@ export default function OrderTrackingPage() {
         <div className="bg-white rounded-2xl border border-secondary p-12 text-center shadow-warm-sm">
           <Clock className="w-16 h-16 text-mutedGrey mx-auto mb-4" />
           <h3 className="font-bold text-xl text-textDark">No orders placed yet</h3>
-          <p className="text-sm text-mutedGrey mt-2 mb-6">You haven&apos;t ordered anything yet today. Go see what SMOOZ is blending!</p>
+          <p className="text-sm text-mutedGrey mt-2 mb-6">You haven&apos;t ordered anything yet today. Check out what campus canteens are serving!</p>
           <button 
             onClick={() => router.push('/shops')}
             className="px-6 py-3.5 bg-primary hover:bg-primary-hover text-textDark font-bold rounded-xl text-xs transition-all shadow-sm"
@@ -134,7 +134,9 @@ export default function OrderTrackingPage() {
                             <Store className="w-5 h-5" />
                           </div>
                           <div>
-                            <h3 className="font-bold text-base text-textDark font-poppins">{order.shop_id === 'shop_smooz' ? 'SMOOZ Canteen' : order.shop_id === 'shop_bites' ? 'Campus Bites' : 'Crave Bakery'}</h3>
+                            <h3 className="font-bold text-base text-textDark font-poppins">
+                              {order.shop_id === 'shop_yogi99' ? 'YOGI 99' : order.shop_id === 'shop_amul' ? 'AMUL' : order.shop_id === 'shop_sweetspot' ? 'SWEET SPOT' : order.shop_id === 'shop_dannys' ? "DANNY'S KITCHEN" : 'Campus Canteen'}
+                            </h3>
                             <p className="text-[10px] text-mutedGrey font-semibold uppercase mt-0.5">Order ID: #{order.id.slice(-6).toUpperCase()}</p>
                           </div>
                         </div>
@@ -235,7 +237,9 @@ export default function OrderTrackingPage() {
                         <CheckCircle2 className="w-4 h-4 text-green-600" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-textDark font-poppins">{order.shop_id === 'shop_smooz' ? 'SMOOZ Canteen' : order.shop_id === 'shop_bites' ? 'Campus Bites' : 'Crave Bakery'}</h4>
+                        <h4 className="font-bold text-textDark font-poppins">
+                          {order.shop_id === 'shop_yogi99' ? 'YOGI 99' : order.shop_id === 'shop_amul' ? 'AMUL' : order.shop_id === 'shop_sweetspot' ? 'SWEET SPOT' : order.shop_id === 'shop_dannys' ? "DANNY'S KITCHEN" : 'Campus Canteen'}
+                        </h4>
                         <p className="text-[10px] text-mutedGrey font-medium mt-0.5">
                           {order.items.map(i => `${i.name} (${i.qty})`).join(', ')}
                         </p>

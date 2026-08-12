@@ -112,15 +112,18 @@ export default function ShopsPage() {
             let customizedEta = shop.eta;
             let shopFootnote = "";
             
-            if (shop.id === 'shop_smooz') {
-              customizedEta = "10 mins wait (usually takes 15 mins during busy hours)";
-              shopFootnote = "*their cold coffee is a lifesaver during exams* 🥤";
-            } else if (shop.id === 'shop_yogi99') {
+            if (shop.id === 'shop_yogi99') {
               customizedEta = "12 mins wait (prepared fresh on the grill)";
-              shopFootnote = "*schezwan noodles are prepared fresh to order* 🍜";
-            } else if (shop.id === 'shop_teapost') {
-              customizedEta = "8 mins wait (brews in small fresh batches)";
-              shopFootnote = "*bun maska is best paired with hot ginger tea* 🍞";
+              shopFootnote = "*schezwan noodles and snacks prepared fresh to order* 🍜";
+            } else if (shop.id === 'shop_amul') {
+              customizedEta = "5 mins wait (ready for quick grab)";
+              shopFootnote = "*chilled dairy and ice creams ready on counter* 🍦";
+            } else if (shop.id === 'shop_sweetspot') {
+              customizedEta = "10 mins wait (freshly baked)";
+              shopFootnote = "*delicious pastries and brownies* 🍰";
+            } else if (shop.id === 'shop_dannys') {
+              customizedEta = "18 mins wait (wok-tossed to perfection)";
+              shopFootnote = "*hot noodles and fried rice meal combos* 🍲";
             }
 
             return (

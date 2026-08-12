@@ -58,7 +58,7 @@ function StudentDashboard({ user }) {
         
         // Select initial shop if not selected yet
         if (loadedShops.length > 0 && !selectedShop) {
-          const initialShop = loadedShops.find(s => s.id === 'shop_smooz') || loadedShops[0];
+          const initialShop = loadedShops.find(s => s.id === 'shop_yogi99') || loadedShops[0];
           import('@/lib/db').then(db => db.getShopById(initialShop.id)).then(fullDetails => {
             setSelectedShop(fullDetails);
           });

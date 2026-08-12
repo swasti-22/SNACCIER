@@ -31,12 +31,6 @@ export default function AIHelp() {
         shops.forEach(shop => {
           if (shop.menu) {
             allItems = [...allItems, ...shop.menu.map(item => ({ ...item, shopName: shop.name }))];
-          } else if (shop.id === 'shop_smooz') {
-            allItems = [...allItems, 
-              { id: "m1", name: "Cold Coffee", price: 45, calories: 180, sold_out: false, shopName: "SMOOZ" },
-              { id: "m2", name: "Berry Glow Smoothie", price: 70, calories: 120, sold_out: false, shopName: "SMOOZ" },
-              { id: "m3", name: "Peach Ice Tea", price: 35, calories: 90, sold_out: false, shopName: "SMOOZ" }
-            ];
           }
         });
         setMenuItems(allItems);
@@ -61,25 +55,25 @@ export default function AIHelp() {
       const cheapItems = menuItems.filter(item => item.price <= 50 && !item.sold_out);
       const itemsList = cheapItems.map(i => `• ${i.name} (₹${i.price}) at ${i.shopName}`).join('\n');
       return {
-        text: `Here are the menu options under ₹50 available right now:\n\n${itemsList || "• Adrak Pudina Chai (₹20) at TEA POST\n• Classic Maska Bun (₹30) at TEA POST\n• Kool Koko (₹30) at AMUL"}\n\nThe maska bun and chai combination at Tea Post is highly recommended.`,
+        text: `Here are the menu options under ₹50 available right now:\n\n${itemsList || "• Amul Kool Koko (₹30) at AMUL\n• Chocolate Cone Ice Cream (₹40) at AMUL"}\n\nAmul offers great pocket-friendly treats!`,
         items: cheapItems
       };
     }
 
     if (text.includes('health') || text.includes('diet') || text.includes('calories') || text.includes('gym') || text.includes('fit') || text.includes('protein')) {
-      const healthyItems = menuItems.filter(item => (item.calories && item.calories < 200) || item.name.includes('Smoothie') || item.name.includes('Tea'));
+      const healthyItems = menuItems.filter(item => (item.calories && item.calories < 250));
       const itemsList = healthyItems.map(i => `• ${i.name} (${i.calories} cal, ₹${i.price}) at ${i.shopName}`).join('\n');
       return {
-        text: `Here are the lighter menu choices available on campus:\n\n${itemsList || "• Berry Glow Smoothie (120 cal) at SMOOZ\n• Peach Ice Tea (90 cal) at SMOOZ"}\n\nThe Berry Glow Smoothie at SMOOZ uses Greek yogurt and is a great fresh option.`,
+        text: `Here are the lighter menu choices available on campus:\n\n${itemsList || "• Amul Kool Koko (150 cal) at AMUL"}\n\nCheck out AMUL and Yogi 99 for quick lighter bites.`,
         items: healthyItems
       };
     }
 
     if (text.includes('fast') || text.includes('quick') || text.includes('hurry') || text.includes('speed') || text.includes('lecture') || text.includes('class') || text.includes('late')) {
-      const fastItems = menuItems.filter(item => item.shopName.includes('SMOOZ') && !item.sold_out);
+      const fastItems = menuItems.filter(item => (item.shopName.includes('AMUL') || item.shopName.includes('YOGI 99')) && !item.sold_out);
       const itemsList = fastItems.map(i => `• ${i.name} (₹${i.price}) from ${i.shopName}`).join('\n');
       return {
-        text: `If you are in a hurry, SMOOZ beverages are typically prepared the fastest:\n\n${itemsList || "• Cold Coffee (₹45)\n• Peach Ice Tea (₹35)"}\n\nYou can order in advance and pick it up when you arrive.`,
+        text: `If you are in a hurry, packaged snacks and ready-to-serve items at AMUL and Yogi 99 are the fastest:\n\n${itemsList || "• Amul Kool Koko (₹30) from AMUL\n• Ice Cream Cone (₹40) from AMUL"}\n\nYou can order in advance and pick it up when you arrive.`,
         items: fastItems
       };
     }
@@ -93,11 +87,11 @@ export default function AIHelp() {
       };
     }
 
-    if (text.includes('drink') || text.includes('bev') || text.includes('chai') || text.includes('tea') || text.includes('coffee') || text.includes('smoothie') || text.includes('shake')) {
-      const drinks = menuItems.filter(item => item.shopName.includes('SMOOZ') && !item.sold_out);
-      const itemsList = drinks.map(i => `• ${i.name} (₹${i.price})`).join('\n');
+    if (text.includes('drink') || text.includes('bev') || text.includes('chai') || text.includes('tea') || text.includes('coffee') || text.includes('smoothie') || text.includes('shake') || text.includes('koko')) {
+      const drinks = menuItems.filter(item => (item.shopName.includes('AMUL') || item.name.toLowerCase().includes('drink') || item.name.toLowerCase().includes('koko')) && !item.sold_out);
+      const itemsList = drinks.map(i => `• ${i.name} (₹${i.price}) at ${i.shopName}`).join('\n');
       return {
-        text: `Here are the available beverages and shakes on campus:\n\n${itemsList || "• Cold Coffee (₹45)\n• Berry Glow Smoothie (₹70)\n• Peach Ice Tea (₹35)"}\n\nThe Cold Coffee at SMOOZ is a popular choice.`,
+        text: `Here are the available beverages on campus:\n\n${itemsList || "• Amul Kool Koko (₹30) at AMUL"}\n\nAmul Kool Koko is always a classic favorite!`,
         items: drinks
       };
     }
