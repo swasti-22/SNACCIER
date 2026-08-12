@@ -5,9 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { LogIn, UserPlus, RefreshCw, Key, Mail, User, ShieldAlert, ArrowLeft, Send, Check, ShieldCheck } from 'lucide-react';
+import { LogIn, UserPlus, RefreshCw, Key, Mail, User, ShieldAlert, ArrowLeft, Send, Check, ShieldCheck, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
+import { isCharusatEmail, CHARUSAT_EMAIL_ERROR } from '@/lib/validators';
 
 function LoginContent() {
   const [viewMode, setViewMode] = useState('login'); // 'login' | 'signup' | 'forgot'
@@ -36,6 +37,10 @@ function LoginContent() {
   const handleSendEmailLink = async () => {
     if (!email) {
       setError('Please provide your email address first.');
+      return;
+    }
+    if (!isCharusatEmail(email)) {
+      setError(CHARUSAT_EMAIL_ERROR);
       return;
     }
     setError('');
@@ -77,6 +82,12 @@ function LoginContent() {
     setError('');
     setSuccessMessage('');
     setSubmitting(true);
+    
+    if (!isCharusatEmail(email)) {
+      setError(CHARUSAT_EMAIL_ERROR);
+      setSubmitting(false);
+      return;
+    }
     
     try {
       if (viewMode === 'login') {
@@ -149,15 +160,18 @@ function LoginContent() {
       <div className="w-full max-w-md bg-[#FDFBF7] border-2 border-dashed border-textDark/20 p-8 rounded-3xl shadow-warm-lg space-y-6 relative overflow-hidden bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
 
         <div className="text-center space-y-2 pt-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/20 text-textDark text-[10px] font-bold rounded-full uppercase tracking-wider mb-1">
+            <GraduationCap className="w-3.5 h-3.5" /> CHARUSAT Campus Only
+          </div>
           <h1 className="font-poppins text-3xl font-extrabold text-textDark tracking-tight lowercase">
             {viewMode === 'login' && 'welcome back'}
             {viewMode === 'signup' && 'join snaccier!'}
             {viewMode === 'forgot' && 'recover account'}
           </h1>
           <p className="text-xs text-mutedGrey font-bold leading-relaxed max-w-xs mx-auto">
-            {viewMode === 'login' && 'Order food from your favorite campus canteens.'}
-            {viewMode === 'signup' && 'Join the campus pre-ordering system.'}
-            {viewMode === 'forgot' && 'Send a reset link to your email or set a new password directly.'}
+            {viewMode === 'login' && 'Log in with your official university email.'}
+            {viewMode === 'signup' && 'Sign up with your CHARUSAT university email ID.'}
+            {viewMode === 'forgot' && 'Send a reset link to your CHARUSAT email.'}
           </p>
         </div>
 
@@ -199,13 +213,16 @@ function LoginContent() {
 
           {/* EMAIL */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-mutedGrey uppercase tracking-wider block">Email Address</label>
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-bold text-mutedGrey uppercase tracking-wider block">CHARUSAT Email Address</label>
+              <span className="text-[9px] font-semibold text-primary-hover">@charusat.edu.in</span>
+            </div>
             <div className="relative">
               <input 
                 type="email" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
-                placeholder="name123@gmail.com"
+                placeholder="22ce001@charusat.edu.in"
                 className="w-full border border-secondary rounded-xl pl-10 pr-4 py-3 text-xs focus:outline-none focus:border-primary bg-background"
                 required
               />
